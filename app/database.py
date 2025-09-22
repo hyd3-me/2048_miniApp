@@ -48,3 +48,13 @@ class Base(AsyncAttrs, DeclarativeBase):
     @property
     def __tablename__(cls) -> str:
         return cls.__name__.lower() + 's'
+
+async def get_session() -> AsyncSession:
+    async with async_session_maker() as session:
+        try:
+            yield session  # Возвращаем сессию для использования
+        except Exception:
+            await session.rollback()  # Откатываем транзакцию при ошибке
+            raise
+        finally:
+            await session.close()  # Закрываем сессию

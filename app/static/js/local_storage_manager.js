@@ -44,8 +44,28 @@ LocalStorageManager.prototype.getBestScore = function () {
   return this.storage.getItem(this.bestScoreKey) || 0;
 };
 
-LocalStorageManager.prototype.setBestScore = function (score) {
-  this.storage.setItem(this.bestScoreKey, score);
+LocalStorageManager.prototype.setBestScore = async function (score) {
+    this.storage.setItem(this.bestScoreKey, score);
+    const userId = localStorage.getItem("userId");
+    try {
+        // Отправка нового результата на сервер
+        const response = await fetch(`/api/bestScore/${userId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({score: score})
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Best score updated on server:", data.best_score);
+        } else {
+            console.error("Failed to update best score on server.");
+        }
+    } catch (error) {
+        console.error("Error updating best score on server:", error);
+    }
 };
 
 // Game state getters/setters and clearing
@@ -60,4 +80,29 @@ LocalStorageManager.prototype.setGameState = function (gameState) {
 
 LocalStorageManager.prototype.clearGameState = function () {
   this.storage.removeItem(this.gameStateKey);
+};
+
+LocalStorageManager.prototype.clearStorage = async function () {
+    const userId = localStorage.getItem("userId");
+    this.storage.clear();
+
+    try {
+        // Отправка нового результата на сервер
+        const response = await fetch(`/api/bestScore/${userId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({score: 0}) // Убедитесь, что это объект { score: <значение> }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Best score updated on server:", data.best_score);
+        } else {
+            console.error("Failed to update best score on server.");
+        }
+    } catch (error) {
+        console.error("Error updating best score on server:", error);
+    }
 };

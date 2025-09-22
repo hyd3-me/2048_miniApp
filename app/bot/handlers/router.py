@@ -29,9 +29,8 @@ async def cmd_start(message: Message, session: AsyncSession, **kwargs):
 
     try:
         user_id = message.from_user.id
-        logger.info(f"Получен старт от пользователя {user_id}")
+        logger.info(f"Получен старт от пользователя {message.from_user.username} id:{user_id}")
         user_info = await UserDAO.find_one_or_none(session=session, filters=TelegramIDModel(telegram_id=user_id))
-        logger.info(f"Информация о пользователе: {user_info}")
 
         if not user_info:
             logger.info("Пользователь не найден, создаём нового")
@@ -44,10 +43,8 @@ async def cmd_start(message: Message, session: AsyncSession, **kwargs):
                 best_score=0
             )
             await UserDAO.add(session=session, values=values)
-            logger.info("Пользователь успешно создан")
 
         await message.answer(welcome_text, reply_markup=main_keyboard())
-        logger.info("Приветственное сообщение отправлено")
 
     except Exception as e:
         logger.error(f"Ошибка в cmd_start: {e}", exc_info=True)
