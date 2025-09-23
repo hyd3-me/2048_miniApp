@@ -127,6 +127,28 @@ KeyboardInputManager.prototype.listen = function () {
   });
 };
 
+KeyboardInputManager.prototype.bindArrowButtons = function () {
+  var self = this;
+
+  var buttonMap = {
+    'up-btn': 0,    // Вверх
+    'right-btn': 1, // Вправо
+    'down-btn': 2,  // Вниз
+    'left-btn': 3   // Влево
+  };
+
+  Object.keys(buttonMap).forEach(function(className) {
+    var button = document.querySelector('.' + className);
+    if (button) {
+      // Используем pointerdown для всех устройств
+      button.addEventListener('pointerdown', function(event) {
+        event.preventDefault();
+        self.emit("move", buttonMap[className]);
+      });
+    }
+  });
+};
+
 KeyboardInputManager.prototype.restart = function (event) {
   event.preventDefault();
   this.emit("restart");
