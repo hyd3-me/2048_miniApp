@@ -125,6 +125,9 @@ KeyboardInputManager.prototype.listen = function () {
       self.emit("move", absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
     }
   });
+
+  // Bind arrow buttons
+  this.bindArrowButtons();
 };
 
 KeyboardInputManager.prototype.bindArrowButtons = function () {
